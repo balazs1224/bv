@@ -75,6 +75,7 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
       riskChangedFrom={riskChangedFrom}
       timelineEvents={scenario.timeline}
       timelineRevealCount={timelineRevealCount}
+      mergeScene={stage.type === "awareness-map"}
     >
       {stage.type === "brief" && <SituationBrief stage={stage} onContinue={goNext} />}
 

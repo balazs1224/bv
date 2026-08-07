@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { MessageCircle, Quote } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import type { CommunicationChoice, Stage } from "@/lib/types";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { scoreCommunicationChoice } from "@/lib/scenario-engine";
 import { cn } from "@/lib/utils";
 
@@ -38,85 +35,92 @@ export function CommunicationTask({
   };
 
   return (
-    <Card className="border-border/80 bg-card">
-      <CardContent className="space-y-5 p-6">
-        <div className="space-y-2">
-          <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-            <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
-            Deeszkalációs kommunikáció
-          </p>
-          {stage.narrative && <p className="text-sm leading-relaxed text-foreground/90">{stage.narrative}</p>}
-          {stage.question && <p className="text-base font-medium text-foreground">{stage.question}</p>}
-        </div>
-
-        <div role="group" aria-label={stage.question} className="space-y-2.5">
-          {choices.map((choice) => {
-            const isChosen = chosenId === choice.id;
-            const disabled = chosenId !== null;
-            return (
-              <button
-                key={choice.id}
-                type="button"
-                aria-pressed={isChosen}
-                disabled={disabled}
-                onClick={() => handleChoose(choice)}
-                className={cn(
-                  "flex w-full items-start gap-3 rounded-lg border px-4 py-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default",
-                  isChosen
-                    ? "border-primary/60 bg-primary/10"
-                    : disabled
-                      ? "border-border/60 bg-secondary/20 opacity-60"
-                      : "border-border bg-secondary/30 hover:border-primary/40 hover:bg-secondary/50"
-                )}
-              >
-                <Quote className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                <span className="space-y-1">
-                  <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {choice.label}
-                  </span>
-                  <span className="block text-sm italic leading-relaxed text-foreground/95">{choice.text}</span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {chosen && result && (
+    <div className="flex h-full flex-col border border-hairline bg-surface p-6 sm:p-8">
+      <AnimatePresence mode="wait">
+        {!chosen ? (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="space-y-4 border-t border-border/70 pt-5"
+            key="choices"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex h-full flex-col gap-5"
           >
-            <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
-              {METRICS.map((metric) => {
-                const raw = chosen.scores[metric.key];
-                const display = metric.invert ? 100 - raw : raw;
-                return (
-                  <div key={metric.key} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-foreground/80">{metric.label}</span>
-                      <span className="font-medium tabular-nums text-foreground">{display}%</span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <motion.div
-                        className={cn("h-full rounded-full", display >= 65 ? "bg-success" : display >= 40 ? "bg-warning" : "bg-critical")}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${display}%` }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="space-y-2">
+              <p className="type-eyebrow">Deeszkalációs kommunikáció</p>
+              {stage.narrative && <p className="text-[13px] leading-relaxed text-muted-foreground">{stage.narrative}</p>}
+              {stage.question && <p className="text-[16px] font-medium text-foreground">{stage.question}</p>}
             </div>
-            <p className="text-sm leading-relaxed text-foreground/90">{chosen.feedback}</p>
-            <Button onClick={onContinue} size="lg">
-              Tovább
-            </Button>
+
+            <div role="group" aria-label={stage.question} className="divide-y divide-hairline border-y border-hairline">
+              {choices.map((choice) => (
+                <button
+                  key={choice.id}
+                  type="button"
+                  onClick={() => handleChoose(choice)}
+                  className="group flex w-full flex-col gap-1 border-l-2 border-transparent py-4 pl-3 pr-2 text-left transition-colors hover:border-primary/50 hover:bg-surface-raised/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span className="type-label">{choice.label}</span>
+                  <span className="text-[14.5px] italic leading-relaxed text-foreground/95">„{choice.text}”</span>
+                </button>
+              ))}
+            </div>
           </motion.div>
+        ) : (
+          result && (
+            <motion.div
+              key="outcome"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              className="flex h-full flex-col justify-between gap-6"
+            >
+              <div className="space-y-6">
+                <div className="border-b border-hairline pb-4">
+                  <p className="type-eyebrow mb-1">Kommunikáció értékelve</p>
+                  <p className="text-[15px] font-medium text-foreground">„{chosen.text}”</p>
+                </div>
+
+                <div className="grid gap-x-6 gap-y-3.5 sm:grid-cols-2">
+                  {METRICS.map((metric) => {
+                    const raw = chosen.scores[metric.key];
+                    const display = metric.invert ? 100 - raw : raw;
+                    return (
+                      <div key={metric.key} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-foreground/75">{metric.label}</span>
+                          <span className="font-mono tabular-nums text-foreground">{display}%</span>
+                        </div>
+                        <div className="h-[3px] w-full bg-muted">
+                          <motion.div
+                            className={cn(
+                              "h-full",
+                              display >= 65 ? "bg-success" : display >= 40 ? "bg-warning" : "bg-critical"
+                            )}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${display}%` }}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <p className="text-[14px] leading-relaxed text-foreground/90">{chosen.feedback}</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={onContinue}
+                className="inline-flex w-fit items-center gap-2 bg-primary px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Tovább
+              </button>
+            </motion.div>
+          )
         )}
-      </CardContent>
-    </Card>
+      </AnimatePresence>
+    </div>
   );
 }

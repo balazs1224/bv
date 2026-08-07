@@ -121,6 +121,30 @@ export const COMPETENCY_HEATMAP: Record<CompetencyKey, Record<GroupKey, number>>
   dokumentacio: { csoport_a: 61, csoport_b: 57, uj_belepok: 39, halado_kepzes: 73 },
 };
 
+export type CompetencyRiskStatus = "jo" | "figyelmet_igenyel" | "fejlesztendo";
+
+export interface CompetencyRiskRow {
+  key: CompetencyKey;
+  average: number;
+  status: CompetencyRiskStatus;
+}
+
+const GROUP_KEYS: GroupKey[] = ["csoport_a", "csoport_b", "uj_belepok", "halado_kepzes"];
+
+function statusFor(avg: number): CompetencyRiskStatus {
+  if (avg >= 75) return "jo";
+  if (avg >= 60) return "figyelmet_igenyel";
+  return "fejlesztendo";
+}
+
+export const COMPETENCY_RISK: CompetencyRiskRow[] = (Object.keys(COMPETENCY_HEATMAP) as CompetencyKey[]).map(
+  (key) => {
+    const values = GROUP_KEYS.map((g) => COMPETENCY_HEATMAP[key][g]);
+    const average = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+    return { key, average, status: statusFor(average) };
+  }
+);
+
 export interface GroupComparisonRow {
   group: string;
   completion: number;

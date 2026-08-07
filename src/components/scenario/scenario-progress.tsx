@@ -16,7 +16,7 @@ export function ScenarioProgress({
           key={i}
           aria-hidden="true"
           className={cn(
-            "h-1.5 flex-1 rounded-full transition-colors duration-500",
+            "h-[3px] flex-1 transition-colors duration-500",
             i < current ? "bg-primary" : i === current ? "bg-primary/50" : "bg-muted"
           )}
         />
@@ -24,7 +24,7 @@ export function ScenarioProgress({
       <span className="sr-only">
         {current + 1}. lépés a(z) {total}-ból
       </span>
-      <span className="ml-2 shrink-0 text-xs font-medium tabular-nums text-muted-foreground" aria-hidden="true">
+      <span className="ml-2 shrink-0 font-mono text-xs tabular-nums text-muted-foreground" aria-hidden="true">
         {current + 1} / {total}
       </span>
     </div>

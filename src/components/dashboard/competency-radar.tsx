@@ -19,19 +19,21 @@ export function CompetencyRadar({ values }: { values: Record<CompetencyKey, numb
       aria-label={`Kompetenciaprofil radar diagram: ${data.map((d) => `${d.label} ${d.value} százalék`).join(", ")}`}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} outerRadius="62%" margin={{ top: 8, bottom: 8, left: 24, right: 24 }}>
-          <PolarGrid stroke={CHART_COLORS.border} />
+        <RadarChart data={data} outerRadius="62%" margin={{ top: 8, bottom: 8, left: 28, right: 28 }}>
+          <PolarGrid stroke={CHART_COLORS.hairline} radialLines={false} />
           <PolarAngleAxis
             dataKey="label"
-            tick={{ fill: CHART_COLORS.mutedForeground, fontSize: 11 }}
+            tick={{ fill: CHART_COLORS.mutedForeground, fontSize: 10.5 }}
+            tickLine={false}
           />
           <Radar
             dataKey="value"
             stroke={CHART_COLORS.primary}
             fill={CHART_COLORS.primary}
-            fillOpacity={0.28}
-            strokeWidth={2}
+            fillOpacity={0.16}
+            strokeWidth={1.5}
             isAnimationActive={false}
+            dot={{ r: 2.5, fill: CHART_COLORS.primary, strokeWidth: 0 }}
           />
         </RadarChart>
       </ResponsiveContainer>

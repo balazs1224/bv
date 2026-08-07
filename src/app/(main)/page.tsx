@@ -1,105 +1,79 @@
-import { Flame, Clock, Target, ArrowRight } from "lucide-react";
+import { Flame, Clock, Target, ArrowRight, Presentation } from "lucide-react";
 import Link from "next/link";
 import { LEARNER } from "@/lib/data/learner";
 import { ESET_07, OTHER_SCENARIOS } from "@/lib/data/scenarios";
-import { COMPETENCY_ORDER } from "@/lib/data/meta";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { TodayScenarioHero, ScenarioListCard } from "@/components/dashboard/scenario-cards";
-import { CompetencyRadar } from "@/components/dashboard/competency-radar";
-import { CompetencyIndicator } from "@/components/shared/competency-indicator";
+import { MissionBrief } from "@/components/dashboard/mission-brief";
+import { StatusStrip } from "@/components/dashboard/status-strip";
+import { SituationRow } from "@/components/dashboard/situation-row";
+import { CompetencyModule } from "@/components/dashboard/competency-module";
 import { AdaptiveRecommendation } from "@/components/shared/adaptive-recommendation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Section } from "@/components/system/section";
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1.5">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            Jó szolgálatot, {LEARNER.name}!
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {LEARNER.level} – {LEARNER.levelNumber === 2 ? "II." : `${LEARNER.levelNumber}.`} szint ·{" "}
-            {LEARNER.xp.toLocaleString("hu-HU")} / {LEARNER.xpToNextLevel.toLocaleString("hu-HU")} XP a következő szintig
-          </p>
+    <div className="mx-auto max-w-7xl space-y-10 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <div>
+          <p className="type-eyebrow mb-1">Szolgálati áttekintés</p>
+          <h1 className="text-2xl font-semibold text-foreground">Jó szolgálatot, {LEARNER.name}!</h1>
         </div>
-        <div className="inline-flex items-center gap-2 self-start rounded-full border border-warning/30 bg-warning/10 px-3.5 py-1.5 text-sm font-medium text-warning sm:self-auto">
-          <Flame className="h-4 w-4" aria-hidden="true" />
-          {LEARNER.streakDays} napos sorozat
-        </div>
+        <p className="flex items-center gap-4 pb-0.5 text-xs text-muted-foreground">
+          <span>
+            {LEARNER.level} · {LEARNER.levelNumber === 2 ? "II." : `${LEARNER.levelNumber}.`} szint
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Flame className="h-3.5 w-3.5 text-warning" aria-hidden="true" />
+            {LEARNER.streakDays} napos sorozat
+          </span>
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard icon={Target} label="Teljesítés" value={`${LEARNER.completionRate}%`} hint="Teljes képzési anyag" />
-        <StatCard icon={Clock} label="Képzési idő" value={LEARNER.trainingTimeLabel} hint="Az elmúlt 30 napban" />
-        <StatCard icon={Flame} label="Aktuális sorozat" value={`${LEARNER.streakDays} nap`} hint="Egymást követő aktív nap" />
-      </div>
+      <MissionBrief scenario={ESET_07} />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <section aria-labelledby="mai-szituacio">
-            <h2 id="mai-szituacio" className="sr-only">
-              Mai szituáció
-            </h2>
-            <TodayScenarioHero scenario={ESET_07} />
-          </section>
+      <StatusStrip
+        items={[
+          { icon: Target, label: "Teljesítés", value: `${LEARNER.completionRate}%`, hint: "Teljes képzési anyag" },
+          { icon: Clock, label: "Képzési idő", value: LEARNER.trainingTimeLabel, hint: "Elmúlt 30 nap" },
+          { icon: Flame, label: "Sorozat", value: `${LEARNER.streakDays} nap`, hint: "Egymást követő aktív nap" },
+        ]}
+      />
 
-          <section aria-labelledby="tovabbi-szituaciok">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 id="tovabbi-szituaciok" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                További szituációk
-              </h2>
-              <Link href="/kepzesek" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                Összes képzés
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {OTHER_SCENARIOS.map((s) => (
-                <ScenarioListCard key={s.id} scenario={s} />
-              ))}
-            </div>
-          </section>
-        </div>
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.6fr_1fr]">
+        <Section
+          eyebrow="Gyakorlótár"
+          title="További szituációk"
+          action={
+            <Link href="/kepzesek" className="inline-flex items-center gap-1 text-xs font-medium text-primary">
+              Összes képzés
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          }
+        >
+          <ul className="divide-y divide-hairline border-y border-hairline">
+            {OTHER_SCENARIOS.map((s) => (
+              <SituationRow key={s.id} scenario={s} />
+            ))}
+          </ul>
+        </Section>
 
         <div className="space-y-6">
-          <Card className="border-border/80 bg-card">
-            <CardHeader>
-              <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                Kompetenciaprofil
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <CompetencyRadar values={LEARNER.competencies} />
-              <div className="space-y-3.5 border-t border-border/70 pt-4">
-                {COMPETENCY_ORDER.map((key) => (
-                  <CompetencyIndicator key={key} competency={key} value={LEARNER.competencies[key]} />
-                ))}
-              </div>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                A kompetenciaszintek a szituációkban hozott döntések alapján, folyamatosan frissülnek.
-              </p>
-            </CardContent>
-          </Card>
-
+          <CompetencyModule values={LEARNER.competencies} />
           <AdaptiveRecommendation />
         </div>
       </div>
 
-      <Card className="border-dashed border-border/80 bg-transparent">
-        <CardContent className="flex flex-col items-start justify-between gap-4 p-5 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-medium text-foreground">Bemutatnád a platformot a bíráló bizottságnak?</p>
-            <p className="text-xs text-muted-foreground">
-              Indítsd el a vezetett pályázati bemutatót – kb. 5 perc, előre összeállított útvonalon.
-            </p>
-          </div>
-          <Button render={<Link href="/demo" />} nativeButton={false} variant="outline">
-            Pályázati demo indítása
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-start justify-between gap-3 border-t border-hairline pt-6 sm:flex-row sm:items-center">
+        <p className="text-[13px] text-muted-foreground">
+          Bemutatnád a platformot a bíráló bizottságnak? Vezetett, kb. 5 perces pályázati bemutató.
+        </p>
+        <Link
+          href="/demo"
+          className="inline-flex shrink-0 items-center gap-2 border border-hairline px-4 py-2 text-xs font-semibold uppercase tracking-wide text-foreground/85 transition-colors hover:border-primary/40 hover:text-foreground"
+        >
+          <Presentation className="h-3.5 w-3.5" aria-hidden="true" />
+          Pályázati demo
+        </Link>
+      </div>
     </div>
   );
 }

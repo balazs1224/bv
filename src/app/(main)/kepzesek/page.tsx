@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { Clock, ListChecks, Layers, ShieldAlert, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { TRAINING_MODULES } from "@/lib/data/modules";
 import { MUVELET_KRITIKUS_PONT } from "@/lib/data/scenarios";
-import { ModuleCard } from "@/components/modules/module-card";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { DifficultyBadge } from "@/components/shared/difficulty-badge";
+import { ModuleRow } from "@/components/modules/module-row";
 
 export default function KepzesekPage() {
   const regular = TRAINING_MODULES.filter((m) => m.status !== "zarolt");
@@ -13,59 +10,57 @@ export default function KepzesekPage() {
   const scenario = MUVELET_KRITIKUS_PONT;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <div className="space-y-1.5">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Képzések</h1>
-        <p className="text-sm text-muted-foreground">
-          A szituációalapú képzési sor kilenc modulból épül fel, a helyzetfelismeréstől a záró komplex gyakorlatig.
+    <div className="mx-auto max-w-7xl space-y-10 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
+      <div>
+        <p className="type-eyebrow mb-1">Gyakorlótár</p>
+        <h1 className="text-2xl font-semibold text-foreground">Képzések</h1>
+        <p className="mt-1 max-w-2xl text-[13.5px] text-muted-foreground">
+          A szituációalapú képzési sor kilenc modulból épül fel, a helyzetfelismeréstől a záró komplex
+          gyakorlatig.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="divide-y divide-hairline border-y border-hairline">
         {regular.map((m) => (
-          <ModuleCard key={m.id} module={m} />
+          <li key={m.id}>
+            <ModuleRow module={m} />
+          </li>
         ))}
-      </div>
+      </ul>
 
       {finalModule && (
-        <Card className="overflow-hidden border-critical/25 bg-gradient-to-br from-critical/10 via-card to-card">
-          <CardContent className="flex flex-col gap-5 p-6 sm:p-7">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-critical/30 bg-critical/10 px-3 py-1 text-xs font-semibold text-critical">
-                <ShieldAlert className="h-3.5 w-3.5" aria-hidden="true" />
-                {finalModule.index} · Záró szituáció
-              </span>
-              <DifficultyBadge difficulty={scenario.difficulty} />
-            </div>
+        <div className="border border-hairline bg-surface p-6 sm:p-10">
+          <p className="type-eyebrow mb-3 text-critical">
+            {finalModule.index} · Záró szituáció · {scenario.difficulty === "halado" ? "Haladó" : ""}
+          </p>
+          <h2 className="font-display text-2xl leading-tight text-foreground sm:text-3xl">{scenario.title}</h2>
+          <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">
+            {scenario.description}
+          </p>
 
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-foreground sm:text-2xl">{scenario.title}</h2>
-              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{scenario.description}</p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/60 px-2 py-1 text-xs text-secondary-foreground">
-                <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                Idő: {scenario.estimatedTime}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/60 px-2 py-1 text-xs text-secondary-foreground">
-                <ListChecks className="h-3.5 w-3.5" aria-hidden="true" />
-                Döntési pont: {scenario.decisionPoints}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/60 px-2 py-1 text-xs text-secondary-foreground">
-                <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-                Kompetencia: {scenario.competencies.length}
-              </span>
-            </div>
-
+          <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-2 text-sm">
             <div>
-              <Button render={<Link href={`/szituacio/${scenario.id}`} />} nativeButton={false} size="lg" className="gap-2">
-                Záró szituáció indítása
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Button>
+              <dt className="type-label">Idő</dt>
+              <dd className="font-mono text-foreground/85">{scenario.estimatedTime}</dd>
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <dt className="type-label">Döntési pont</dt>
+              <dd className="font-mono text-foreground/85">{scenario.decisionPoints}</dd>
+            </div>
+            <div>
+              <dt className="type-label">Kompetencia</dt>
+              <dd className="font-mono text-foreground/85">{scenario.competencies.length}</dd>
+            </div>
+          </dl>
+
+          <Link
+            href={`/szituacio/${scenario.id}`}
+            className="mt-7 inline-flex items-center gap-2 bg-primary px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Záró szituáció indítása
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </Link>
+        </div>
       )}
     </div>
   );

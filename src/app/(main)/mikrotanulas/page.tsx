@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, XCircle, Zap, Trophy, RotateCcw } from "lucide-react";
+import { CheckCircle2, XCircle, Trophy, RotateCcw } from "lucide-react";
 import { MICRO_EXERCISES } from "@/lib/data/microlearning";
 import { COMPETENCIES } from "@/lib/data/meta";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ScenarioProgress } from "@/components/scenario/scenario-progress";
 import { cn } from "@/lib/utils";
 
@@ -43,105 +41,96 @@ export default function MikrotanulasPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-6 lg:py-8">
-      <div className="space-y-1.5">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">5 perces gyakorlás</h1>
-        <p className="text-sm text-muted-foreground">
+    <div className="mx-auto max-w-3xl space-y-8 px-5 py-8 sm:px-8 lg:py-12">
+      <div>
+        <p className="type-eyebrow mb-1">Mikrotanulás</p>
+        <h1 className="text-2xl font-semibold text-foreground">5 perces gyakorlás</h1>
+        <p className="mt-1 text-[13.5px] text-muted-foreground">
           Rövid, célzott mikrotanulási kérdések – ideális egy szolgálat előtti gyors ismétléshez.
         </p>
       </div>
 
       {!finished && exercise ? (
-        <div key={`${runKey}-${index}`} className="space-y-4">
+        <div key={`${runKey}-${index}`} className="space-y-5">
           <ScenarioProgress total={total} current={index} />
 
-          <Card className="border-border/80 bg-card">
-            <CardContent className="space-y-5 p-6">
-              <div className="space-y-2">
-                <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                  {COMPETENCIES[exercise.competency].label}
-                </span>
-                <p className="text-base font-medium leading-relaxed text-foreground">{exercise.question}</p>
+          <div className="border border-hairline bg-surface p-6 sm:p-8">
+            <div className="space-y-2">
+              <p className="type-label text-primary">{COMPETENCIES[exercise.competency].label}</p>
+              <p className="text-[16px] font-medium leading-relaxed text-foreground">{exercise.question}</p>
+            </div>
+
+            <div role="group" aria-label={exercise.question} className="mt-5 divide-y divide-hairline border-y border-hairline">
+              {exercise.options.map((opt) => {
+                const isSelected = selectedId === opt.id;
+                const revealed = selectedId !== null;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    disabled={revealed}
+                    onClick={() => handleSelect(opt.id)}
+                    className={cn(
+                      "flex w-full items-center gap-3 py-3.5 text-left text-[14px] transition-colors disabled:cursor-default",
+                      revealed && opt.correct && "text-success",
+                      revealed && isSelected && !opt.correct && "text-critical",
+                      !revealed && "text-foreground/90 hover:text-primary",
+                      revealed && !isSelected && !opt.correct && "text-muted-foreground"
+                    )}
+                  >
+                    {revealed && opt.correct && <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                    {revealed && isSelected && !opt.correct && <XCircle className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                    {(!revealed || (!opt.correct && !isSelected)) && <span className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                    <span>{opt.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {selectedOption && (
+              <div className={cn("mt-5 space-y-1.5 border-l-2 pl-4", selectedOption.correct ? "border-success/50" : "border-warning/50")}>
+                <p className="type-label">Magyarázat</p>
+                <p className="text-[13.5px] leading-relaxed text-foreground/85">{exercise.explanation}</p>
               </div>
+            )}
 
-              <div role="radiogroup" aria-label={exercise.question} className="space-y-2.5">
-                {exercise.options.map((opt) => {
-                  const isSelected = selectedId === opt.id;
-                  const revealed = selectedId !== null;
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={isSelected}
-                      disabled={revealed}
-                      onClick={() => handleSelect(opt.id)}
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default",
-                        revealed && opt.correct && "border-success/50 bg-success/10",
-                        revealed && isSelected && !opt.correct && "border-critical/50 bg-critical/10",
-                        !revealed && "border-border bg-secondary/30 hover:border-primary/40 hover:bg-secondary/50",
-                        revealed && !isSelected && !opt.correct && "border-border/50 opacity-60"
-                      )}
-                    >
-                      {revealed && opt.correct && <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />}
-                      {revealed && isSelected && !opt.correct && <XCircle className="h-4 w-4 shrink-0 text-critical" aria-hidden="true" />}
-                      <span className="text-foreground/95">{opt.text}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {selectedOption && (
-                <div
-                  className={cn(
-                    "space-y-1.5 rounded-lg border p-3.5 text-sm leading-relaxed",
-                    selectedOption.correct
-                      ? "border-success/30 bg-success/8 text-foreground/90"
-                      : "border-warning/30 bg-warning/8 text-foreground/90"
-                  )}
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Magyarázat</p>
-                  <p>{exercise.explanation}</p>
-                </div>
-              )}
-
-              {selectedId && (
-                <Button onClick={handleNext} size="lg">
-                  {index + 1 < total ? "Következő kérdés" : "Összegzés"}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+            {selectedId && (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="mt-6 inline-flex items-center gap-2 bg-primary px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                {index + 1 < total ? "Következő kérdés" : "Összegzés"}
+              </button>
+            )}
+          </div>
         </div>
       ) : (
-        <Card className="border-primary/25 bg-gradient-to-br from-accent/70 to-card">
-          <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full border border-success/40 bg-success/15 text-success">
-              <Trophy className="h-7 w-7" aria-hidden="true" />
-            </span>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-success">Gyakorlás teljesítve</p>
-              <p className="mt-1 text-3xl font-semibold tabular-nums text-foreground">
-                {correctCount} / {total}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">helyes válasz</p>
-            </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">
-              <Zap className="h-4 w-4" aria-hidden="true" />
-              +{correctCount * XP_PER_CORRECT} XP
-            </span>
-            <div className="flex flex-wrap justify-center gap-3 pt-2">
-              <Button render={<Link href="/" />} nativeButton={false} size="lg">
-                Vissza a vezérlőpultra
-              </Button>
-              <Button onClick={restart} variant="outline" size="lg" className="gap-1.5">
-                <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                Újra
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="border border-hairline bg-surface px-6 py-12 text-center sm:px-10">
+          <Trophy className="mx-auto h-8 w-8 text-success" aria-hidden="true" />
+          <p className="type-eyebrow mt-4">Gyakorlás teljesítve</p>
+          <p className="font-display mt-1 text-4xl text-foreground">
+            {correctCount} / {total}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">helyes válasz</p>
+          <p className="mt-3 font-mono text-sm tabular-nums text-primary">+{correctCount * XP_PER_CORRECT} XP</p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 bg-primary px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Vezérlőpultra
+            </Link>
+            <button
+              type="button"
+              onClick={restart}
+              className="inline-flex items-center gap-2 border border-hairline px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-foreground/85 transition-colors hover:border-primary/40"
+            >
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              Újra
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

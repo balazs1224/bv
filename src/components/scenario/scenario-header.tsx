@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { X, Zap } from "lucide-react";
+import { X } from "lucide-react";
 import type { Scenario } from "@/lib/types";
+import { StatusDot } from "@/components/system/panel";
 import { cn } from "@/lib/utils";
 
 export function ScenarioHeader({
@@ -8,52 +9,61 @@ export function ScenarioHeader({
   currentTime,
   isComplete,
   xp,
+  stageIndex,
+  stageCount,
 }: {
   scenario: Scenario;
   currentTime: string;
   isComplete: boolean;
   xp: number;
+  stageIndex: number;
+  stageCount: number;
 }) {
+  const progressPct = Math.round(((stageIndex + 1) / stageCount) * 100);
+
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-30 border-b border-hairline bg-background">
+      <div className="h-[2px] w-full bg-hairline">
+        <div
+          className="h-full bg-primary transition-[width] duration-500 ease-out"
+          style={{ width: `${progressPct}%` }}
+        />
+      </div>
+      <div className="mx-auto flex h-12 max-w-[1440px] items-center gap-4 px-4 sm:px-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Kilépés a szituációból, vissza a vezérlőpultra"
         >
-          <X className="h-4.5 w-4.5" aria-hidden="true" />
+          <X className="h-4 w-4" aria-hidden="true" />
         </Link>
 
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="rounded border border-border px-1.5 py-0.5 font-mono text-xs tracking-wide text-foreground/80">
-            {scenario.code}
-          </span>
-          <span className="font-mono text-sm tabular-nums text-foreground/90">{currentTime}</span>
-          <span className="hidden text-sm text-muted-foreground sm:inline">
-            {scenario.location.toUpperCase()}
-          </span>
-          <h1 className="w-full truncate text-sm font-semibold text-foreground sm:hidden">{scenario.title}</h1>
+        <div className="hidden h-4 w-px bg-hairline sm:block" aria-hidden="true" />
+
+        <div className="flex min-w-0 flex-1 items-center gap-x-3 overflow-hidden font-mono text-[12px] tabular-nums text-muted-foreground">
+          <span className="text-foreground">{currentTime}</span>
+          <span aria-hidden="true" className="text-hairline">/</span>
+          <span className="hidden sm:inline">{scenario.code}</span>
+          <span aria-hidden="true" className="hidden text-hairline sm:inline">/</span>
+          <span className="truncate uppercase tracking-wide">{scenario.location}</span>
         </div>
 
         <span
           className={cn(
-            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
-            isComplete
-              ? "border-success/30 bg-success/10 text-success"
-              : "border-warning/30 bg-warning/10 text-warning"
+            "inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide",
+            isComplete ? "text-success" : "text-warning"
           )}
         >
-          <span
-            className={cn("h-1.5 w-1.5 rounded-full", isComplete ? "bg-success" : "animate-pulse bg-warning")}
-            aria-hidden="true"
-          />
-          {isComplete ? "LEZÁRVA" : "FOLYAMATBAN"}
+          <StatusDot tone={isComplete ? "success" : "warning"} className={!isComplete ? "animate-pulse" : undefined} />
+          <span className="hidden sm:inline">{isComplete ? "Lezárva" : "Folyamatban"}</span>
         </span>
 
-        <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-border bg-secondary/60 px-2.5 py-1 text-xs font-semibold text-secondary-foreground sm:inline-flex">
-          <Zap className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+        <span className="hidden shrink-0 items-center gap-1 font-mono text-[12px] tabular-nums text-primary sm:inline-flex">
           {xp} XP
+        </span>
+
+        <span className="hidden shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground md:inline">
+          {stageIndex + 1}/{stageCount}
         </span>
       </div>
     </header>

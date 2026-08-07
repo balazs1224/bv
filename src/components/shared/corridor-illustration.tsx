@@ -1,4 +1,4 @@
-export function CorridorIllustration({ className }: { className?: string }) {
+export function CorridorIllustration({ className, dim = false }: { className?: string; dim?: boolean }) {
   return (
     <svg
       viewBox="0 0 400 500"
@@ -8,37 +8,48 @@ export function CorridorIllustration({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="corridorFloor" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.24 0.02 262)" />
-          <stop offset="100%" stopColor="oklch(0.12 0.015 262)" />
+          <stop offset="0%" stopColor="oklch(0.22 0.008 262)" />
+          <stop offset="100%" stopColor="oklch(0.1 0.006 262)" />
         </linearGradient>
-        <linearGradient id="corridorGlow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.78 0.13 78 / 55%)" />
-          <stop offset="100%" stopColor="oklch(0.78 0.13 78 / 0%)" />
-        </linearGradient>
+        <radialGradient id="corridorGlow" cx="50%" cy="44%" r="38%">
+          <stop offset="0%" stopColor="oklch(0.68 0.09 75 / 30%)" />
+          <stop offset="100%" stopColor="oklch(0.68 0.09 75 / 0%)" />
+        </radialGradient>
+        <radialGradient id="corridorVignette" cx="50%" cy="42%" r="75%">
+          <stop offset="55%" stopColor="black" stopOpacity="0" />
+          <stop offset="100%" stopColor="black" stopOpacity="0.55" />
+        </radialGradient>
+        <filter id="corridorGrain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise" />
+          <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.025 0" />
+        </filter>
       </defs>
+
       <rect width="400" height="500" fill="url(#corridorFloor)" />
-      {/* Perspektivikus folyosó vonalak */}
-      <g stroke="oklch(1 0 0 / 8%)" strokeWidth="1.5">
-        <line x1="0" y1="500" x2="150" y2="220" />
-        <line x1="400" y1="500" x2="250" y2="220" />
-        <line x1="0" y1="0" x2="150" y2="220" />
-        <line x1="400" y1="0" x2="250" y2="220" />
+
+      <g stroke="oklch(1 0 0 / 6%)" strokeWidth="1">
+        <line x1="0" y1="500" x2="150" y2="215" />
+        <line x1="400" y1="500" x2="250" y2="215" />
+        <line x1="0" y1="0" x2="150" y2="215" />
+        <line x1="400" y1="0" x2="250" y2="215" />
       </g>
-      <rect x="150" y="220" width="100" height="0.5" fill="oklch(1 0 0 / 8%)" />
-      {/* Ajtók bal/jobb oldalon, geometrikus, semleges */}
+
       {[70, 180, 290, 400].map((y, i) => (
-        <g key={i} opacity={0.9 - i * 0.14}>
-          <rect x={8 + i * 6} y={y - 60} width="46" height="90" rx="2" fill="oklch(0.3 0.02 262)" stroke="oklch(1 0 0 / 10%)" />
-          <rect x={400 - 54 - i * 6} y={y - 60} width="46" height="90" rx="2" fill="oklch(0.3 0.02 262)" stroke="oklch(1 0 0 / 10%)" />
+        <g key={i} opacity={0.85 - i * 0.15}>
+          <rect x={6 + i * 6} y={y - 58} width="44" height="86" fill="oklch(0.27 0.008 262)" stroke="oklch(1 0 0 / 7%)" />
+          <rect x={400 - 50 - i * 6} y={y - 58} width="44" height="86" fill="oklch(0.27 0.008 262)" stroke="oklch(1 0 0 / 7%)" />
         </g>
       ))}
-      {/* Fény a mélyben – borostyán árnyalat, visszafogottan */}
-      <ellipse cx="200" cy="225" rx="70" ry="24" fill="url(#corridorGlow)" opacity="0.5" />
-      {/* Mennyezeti fénycsíkok */}
-      <g stroke="oklch(0.62 0.09 246 / 25%)" strokeWidth="2">
-        <line x1="60" y1="30" x2="160" y2="215" />
-        <line x1="340" y1="30" x2="240" y2="215" />
+
+      <rect x="0" y="0" width="400" height="500" fill="url(#corridorGlow)" />
+      <g stroke="oklch(0.64 0.045 238 / 22%)" strokeWidth="1.5">
+        <line x1="55" y1="20" x2="158" y2="212" />
+        <line x1="345" y1="20" x2="242" y2="212" />
       </g>
+
+      <rect x="0" y="0" width="400" height="500" fill="url(#corridorVignette)" />
+      <rect x="0" y="0" width="400" height="500" filter="url(#corridorGrain)" opacity="0.5" />
+      {dim && <rect x="0" y="0" width="400" height="500" fill="black" opacity="0.28" />}
     </svg>
   );
 }
