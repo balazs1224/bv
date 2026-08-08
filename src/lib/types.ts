@@ -99,6 +99,15 @@ export type StageType =
   | "awareness-map"
   | "result";
 
+/**
+ * Meghatározza, melyik képi kontextust használja az adott stage.
+ * - hero: a szituáció kontextusteremtő képe
+ * - awareness: a helyszíni, vizuális feladat képe
+ * - none: nincs scene panel (pl. eredmény/reflexió)
+ * - inherit: kompatibilis alapértelmezés; awareness-map => awareness, result => none, egyéb => hero
+ */
+export type StageSceneVisual = "hero" | "awareness" | "none" | "inherit";
+
 export interface Stage {
   id: string;
   type: StageType;
@@ -112,6 +121,7 @@ export interface Stage {
   communicationChoices?: CommunicationChoice[];
   awarenessMarkers?: AwarenessMarker[];
   competencyFocus?: CompetencyKey[];
+  sceneVisual?: StageSceneVisual;
 }
 
 export interface TimelineEvent {
@@ -131,7 +141,7 @@ export interface ScenarioImage {
 }
 
 export interface ScenarioVisual {
-  /** Kontextusteremtő scene/hero kép — az első (brief) stage-en és kártya-thumbnailként jelenik meg. */
+  /** Kontextusteremtő scene/hero kép. */
   hero?: ScenarioImage;
   /** Ténylegesen vizsgálandó, hotspotokkal ellátott megfigyelési kép az awareness-map stage-hez. */
   awareness?: ScenarioImage;
