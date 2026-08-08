@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   CommunicationChoice,
   DecisionOption,
@@ -21,14 +21,81 @@ import { DecisionCard } from "@/components/scenario/decision-card";
 import { CommunicationTask } from "@/components/scenario/communication-task";
 import { AwarenessMap } from "@/components/scenario/awareness-map";
 import { ResultScreen } from "@/components/scenario/result-screen";
+import { useDemoMode } from "@/lib/demo-mode-context";
+
+function applyDemoPreset(
+  scenario: Scenario,
+  targetStageIndex: number
+): {
+  log: DecisionLogEntry[];
+  risk: Record<RiskDimensionKey, RiskLevel>;
+} {
+  let risk = { ...scenario.initialRisk };
+  const log: DecisionLogEntry[] = [];
+
+  for (let i = 0; i < targetStageIndex; i += 1) {
+    const stage = scenario.stages[i];
+
+    if (stage.type === "decision" && stage.options?.length) {
+      const option = stage.options.find((item) => item.quality === "kivalo") ?? stage.options[0];
+      log.push({
+        stageId: stage.id,
+        quality: option.quality,
+        xp: option.xp,
+        competencyImpact: option.competencyImpact,
+      });
+      if (option.riskChanges) risk = applyRiskChanges(risk, option.riskChanges);
+    }
+
+    if (stage.type === "communication" && stage.communicationChoices?.length) {
+      const scored = stage.communicationChoices
+        .map((choice) => ({ choice, result: scoreCommunicationChoice(choice) }))
+        .sort((a, b) => b.result.xp - a.result.xp)[0];
+
+      if (scored) {
+        log.push({
+          stageId: stage.id,
+          quality: scored.result.quality,
+          xp: scored.result.xp,
+          competencyImpact: scored.result.competencyImpact,
+        });
+      }
+    }
+  }
+
+  return { log, risk };
+}
 
 export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
   const stages = scenario.stages;
-  const [stageIndex, setStageIndex] = useState(0);
-  const [log, setLog] = useState<DecisionLogEntry[]>([]);
-  const [risk, setRisk] = useState<Record<RiskDimensionKey, RiskLevel>>(scenario.initialRisk);
+  const demo = useDemoMode();
+  const requestedDemoStageId =
+    demo.active && demo.step.scenarioId === scenario.id ? demo.step.stageId : undefined;
+  const requestedDemoStageIndex = requestedDemoStageId
+    ? stages.findIndex((candidate) => candidate.id === requestedDemoStageId)
+    : -1;
+
+  const initialStageIndex = requestedDemoStageIndex >= 0 ? requestedDemoStageIndex : 0;
+  const initialPreset = applyDemoPreset(scenario, initialStageIndex);
+
+  const [stageIndex, setStageIndex] = useState(initialStageIndex);
+  const [log, setLog] = useState<DecisionLogEntry[]>(initialPreset.log);
+  const [risk, setRisk] = useState<Record<RiskDimensionKey, RiskLevel>>(initialPreset.risk);
   const [riskChangedFrom, setRiskChangedFrom] = useState<Partial<Record<RiskDimensionKey, RiskLevel>>>();
   const [decisionKey, setDecisionKey] = useState(0);
+
+  useEffect(() => {
+    if (!demo.active || demo.step.scenarioId !== scenario.id || !demo.step.stageId) return;
+    const target = stages.findIndex((candidate) => candidate.id === demo.step.stageId);
+    if (target < 0 || target === stageIndex) return;
+
+    const preset = applyDemoPreset(scenario, target);
+    setStageIndex(target);
+    setLog(preset.log);
+    setRisk(preset.risk);
+    setRiskChangedFrom(undefined);
+    setDecisionKey((key) => key + 1);
+  }, [demo.active, demo.step.scenarioId, demo.step.stageId, scenario, stages, stageIndex]);
 
   const stage = stages[stageIndex];
   const isComplete = stage.type === "result";
@@ -66,6 +133,7 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
   return (
     <ScenarioShell
       scenario={scenario}
+      stage={stage}
       currentTime={currentTime}
       isComplete={isComplete}
       xp={xpSoFar}
@@ -75,7 +143,6 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
       riskChangedFrom={riskChangedFrom}
       timelineEvents={scenario.timeline}
       timelineRevealCount={timelineRevealCount}
-      mergeScene={stage.type === "awareness-map" || stage.type === "brief"}
     >
       {stage.type === "brief" && <SituationBrief scenario={scenario} stage={stage} onContinue={goNext} />}
 
