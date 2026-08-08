@@ -1,30 +1,7 @@
-import type { Scenario, Stage, ScenarioImage } from "@/lib/types";
+import type { Scenario, Stage } from "@/lib/types";
 import { CorridorIllustration } from "@/components/shared/corridor-illustration";
 import { ScenarioImageFrame } from "@/components/shared/scenario-image";
-
-function resolveSceneImage(scenario: Scenario, stage: Stage): ScenarioImage | undefined {
-  const mode = stage.sceneVisual ?? "inherit";
-
-  if (mode === "none") return undefined;
-  if (mode === "awareness") return scenario.visual?.awareness ?? scenario.visual?.hero;
-  if (mode === "hero") return scenario.visual?.hero;
-
-  // Adatvezérelt, visszafelé kompatibilis alapértelmezés:
-  // - awareness-map: dedicated awareness kép
-  // - result: nincs scene
-  // - az awareness stage UTÁNI lépések: ugyanabban a helyszíni vizuális kontextusban maradnak
-  // - minden korábbi stage: hero
-  if (stage.type === "awareness-map") return scenario.visual?.awareness ?? scenario.visual?.hero;
-  if (stage.type === "result") return undefined;
-
-  const currentIndex = scenario.stages.findIndex((candidate) => candidate.id === stage.id);
-  const awarenessIndex = scenario.stages.findIndex((candidate) => candidate.type === "awareness-map");
-  if (scenario.visual?.awareness && awarenessIndex >= 0 && currentIndex > awarenessIndex) {
-    return scenario.visual.awareness;
-  }
-
-  return scenario.visual?.hero;
-}
+import { resolveStageSceneImage } from "@/lib/scene-visual";
 
 export function SceneViewport({
   scenario,
@@ -35,7 +12,7 @@ export function SceneViewport({
   stage: Stage;
   currentTime: string;
 }) {
-  const image = resolveSceneImage(scenario, stage);
+  const image = resolveStageSceneImage(scenario, stage);
 
   return (
     <div className="relative min-h-[280px] overflow-hidden border border-hairline bg-surface lg:min-h-full">
