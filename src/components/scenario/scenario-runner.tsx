@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   CommunicationChoice,
   DecisionOption,
@@ -74,6 +74,7 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
   const requestedDemoStageIndex = requestedDemoStageId
     ? stages.findIndex((candidate) => candidate.id === requestedDemoStageId)
     : -1;
+  const requestedDemoKey = requestedDemoStageId ? `${scenario.id}:${requestedDemoStageId}` : null;
 
   const initialStageIndex = requestedDemoStageIndex >= 0 ? requestedDemoStageIndex : 0;
   const initialPreset = applyDemoPreset(scenario, initialStageIndex);
@@ -83,11 +84,19 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
   const [risk, setRisk] = useState<Record<RiskDimensionKey, RiskLevel>>(initialPreset.risk);
   const [riskChangedFrom, setRiskChangedFrom] = useState<Partial<Record<RiskDimensionKey, RiskLevel>>>();
   const [decisionKey, setDecisionKey] = useState(0);
+  const lastAppliedDemoTarget = useRef<string | null>(requestedDemoKey);
 
+  // A demo-lépés váltása közvetlenül megnyithat egy scenario stage-et. Fontos,
+  // hogy csak a DEMO TARGET változásakor szinkronizáljunk: ha a tanuló a stage-en
+  // belül a saját "Tovább" gombjával halad, ne rántsuk vissza folyamatosan a
+  // demo belépési pontra.
   useEffect(() => {
     if (!demo.active || demo.step.scenarioId !== scenario.id || !demo.step.stageId) return;
+    const targetKey = `${scenario.id}:${demo.step.stageId}`;
+    if (lastAppliedDemoTarget.current === targetKey) return;
+
     const target = stages.findIndex((candidate) => candidate.id === demo.step.stageId);
-    if (target < 0 || target === stageIndex) return;
+    if (target < 0) return;
 
     const preset = applyDemoPreset(scenario, target);
     setStageIndex(target);
@@ -95,7 +104,12 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
     setRisk(preset.risk);
     setRiskChangedFrom(undefined);
     setDecisionKey((key) => key + 1);
-  }, [demo.active, demo.step.scenarioId, demo.step.stageId, scenario, stages, stageIndex]);
+    lastAppliedDemoTarget.current = targetKey;
+  }, [demo.active, demo.step.scenarioId, demo.step.stageId, scenario, stages]);
+
+  useEffect(() => {
+    if (!demo.active) lastAppliedDemoTarget.current = null;
+  }, [demo.active]);
 
   const stage = stages[stageIndex];
   const isComplete = stage.type === "result";
