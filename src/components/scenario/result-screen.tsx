@@ -1,9 +1,13 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 import { CheckCircle2, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 import type { CompetencyKey, RiskDimensionKey, RiskLevel, Scenario } from "@/lib/types";
 import { COMPETENCIES, RISK_DIMENSIONS, RISK_DIMENSION_ORDER } from "@/lib/data/meta";
 import { QUALITY_META, formatSigned, getRemainingRisk, scoreToQuality } from "@/lib/scenario-engine";
 import { recommendFromDeltas } from "@/lib/adaptive-recommendation";
+import { DEMO_STEPS, useDemoMode } from "@/lib/demo-mode-context";
 import { cn } from "@/lib/utils";
 
 const TONE_TEXT: Record<string, string> = {
@@ -32,6 +36,22 @@ export function ResultScreen({
   competencyDeltas: Partial<Record<CompetencyKey, number>>;
   finalRisk: Record<RiskDimensionKey, RiskLevel>;
 }) {
+  const demo = useDemoMode();
+
+  // Ha a felhasználó a scenario saját vezérlőivel érkezik meg egy olyan
+  // eredmény-stage-re, amely külön demo-fejezet, az alsó bemutató sáv is kövesse
+  // a ténylegesen látható állapotot. A mapping a DEMO_STEPS metaadatból jön,
+  // nem scenario-specifikus if ágból.
+  useEffect(() => {
+    if (!demo.active) return;
+    const resultStepIndex = DEMO_STEPS.findIndex(
+      (step) => step.scenarioId === scenario.id && step.stageId === "result"
+    );
+    if (resultStepIndex >= 0 && resultStepIndex !== demo.stepIndex) {
+      demo.goToStep(resultStepIndex);
+    }
+  }, [demo, scenario.id]);
+
   const deltaEntries = Object.entries(competencyDeltas) as [CompetencyKey, number][];
   const quality = scoreToQuality(scorePercent);
   const qualityMeta = QUALITY_META[quality];
