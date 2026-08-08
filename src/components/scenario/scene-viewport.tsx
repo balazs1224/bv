@@ -9,10 +9,20 @@ function resolveSceneImage(scenario: Scenario, stage: Stage): ScenarioImage | un
   if (mode === "awareness") return scenario.visual?.awareness ?? scenario.visual?.hero;
   if (mode === "hero") return scenario.visual?.hero;
 
-  // Backwards-compatible default for scenarios that do not yet declare sceneVisual.
-  // Awareness uses the dedicated visual; all other non-result stages use the hero.
+  // Adatvezérelt, visszafelé kompatibilis alapértelmezés:
+  // - awareness-map: dedicated awareness kép
+  // - result: nincs scene
+  // - az awareness stage UTÁNI lépések: ugyanabban a helyszíni vizuális kontextusban maradnak
+  // - minden korábbi stage: hero
   if (stage.type === "awareness-map") return scenario.visual?.awareness ?? scenario.visual?.hero;
   if (stage.type === "result") return undefined;
+
+  const currentIndex = scenario.stages.findIndex((candidate) => candidate.id === stage.id);
+  const awarenessIndex = scenario.stages.findIndex((candidate) => candidate.type === "awareness-map");
+  if (scenario.visual?.awareness && awarenessIndex >= 0 && currentIndex > awarenessIndex) {
+    return scenario.visual.awareness;
+  }
+
   return scenario.visual?.hero;
 }
 
