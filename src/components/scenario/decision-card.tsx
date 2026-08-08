@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { DecisionOption, Stage } from "@/lib/types";
+import type { DecisionOption, RiskDimensionKey, RiskLevel, Stage } from "@/lib/types";
+import { applyRiskChanges, getRemainingRisk } from "@/lib/scenario-engine";
 import { FeedbackPanel } from "@/components/scenario/feedback-panel";
 import { cn } from "@/lib/utils";
 
 export function DecisionCard({
   stage,
+  risk,
   onChoose,
   onContinue,
 }: {
   stage: Stage;
+  risk: Record<RiskDimensionKey, RiskLevel>;
   onChoose: (option: DecisionOption) => void;
   onContinue: () => void;
 }) {
@@ -78,10 +81,12 @@ export function DecisionCard({
         ) : (
           <motion.div key="feedback" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
             <FeedbackPanel
+              decisionText={`${chosen.label}) ${chosen.text}`}
               quality={chosen.quality}
               xp={chosen.xp}
               rationale={chosen.rationale}
               risksReduced={chosen.risksReduced}
+              remainingRisk={getRemainingRisk(applyRiskChanges(risk, chosen.riskChanges))}
               primaryCompetency={chosen.primaryCompetency}
               competencyDelta={chosen.competencyImpact[chosen.primaryCompetency] ?? 0}
               takeaway={chosen.takeaway}

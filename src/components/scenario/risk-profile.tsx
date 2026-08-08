@@ -27,9 +27,21 @@ export function RiskProfile({
   changedFrom?: Partial<Record<RiskDimensionKey, RiskLevel>>;
   className?: string;
 }) {
+  const hasChange = RISK_DIMENSION_ORDER.some((key) => {
+    const prev = changedFrom?.[key];
+    return prev && prev !== risk[key];
+  });
+
   return (
     <div className={cn("border border-hairline bg-surface p-5", className)}>
-      <p className="type-eyebrow mb-4">Kockázati profil</p>
+      <div className="mb-4 flex items-baseline justify-between gap-3">
+        <p className="type-eyebrow">Kockázati profil</p>
+        {hasChange && (
+          <p className="text-[11px] font-medium text-warning" role="status">
+            A döntés hatására módosult
+          </p>
+        )}
+      </div>
       <div className="space-y-3">
         {RISK_DIMENSION_ORDER.map((key) => {
           const meta = RISK_DIMENSIONS[key];

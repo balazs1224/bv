@@ -25,6 +25,14 @@ export const REGGELI_ELLENORZES: Scenario = {
   strengths: "A rutinfeladatok közben is következetesen figyelsz a mintázattól való eltérésekre.",
   growthArea: "Az eltérések dokumentálását érdemes még tudatosabban, részletesebben végezned.",
   nextModule: "Információgyűjtés és jelentés",
+  visual: {
+    hero: {
+      src: "/scenarios/eset-03/hero.webp",
+      alt: "Zárkakörleti folyosó reggeli ellenőrzés közben: szolgálatot teljesítő állomány tagja jegyzettömbbel áll a zárkaajtók előtt, az egyik zárkarácson át fogvatartott látható.",
+      width: 1600,
+      height: 900,
+    },
+  },
   timeline: [
     { id: "t1", time: "06:12", label: "Eltérés észlelve" },
     { id: "t2", time: "06:14", label: "Helyszíni áttekintés" },
@@ -108,6 +116,14 @@ export const LATOGATAS_UTAN: Scenario = {
   strengths: "Empatikusan, mégis szakszerűen közelíted meg a viselkedésváltozást mutató személyeket.",
   growthArea: "A háttér-információk (pl. korábbi bejegyzések) előzetes áttekintését érdemes beépítened a rutinodba.",
   nextModule: "Professzionális kommunikáció",
+  visual: {
+    hero: {
+      src: "/scenarios/eset-11/hero.webp",
+      alt: "Zárkakörleti folyosó: egy fogvatartott lehajtott fejjel, magányosan sétál mások mögött, miközben szolgálatot teljesítő állomány tagja figyeli hátulról.",
+      width: 1600,
+      height: 900,
+    },
+  },
   timeline: [
     { id: "t1", time: "14:52", label: "Viselkedésváltozás észlelve" },
     { id: "t2", time: "14:55", label: "Egyéni beszélgetés kezdeményezve" },
@@ -191,6 +207,14 @@ export const KET_FOGVATARTOTT: Scenario = {
   strengths: "Jól ismered fel, mikor szükséges a támogatás korai bevonása két fél közötti konfliktusnál.",
   growthArea: "A két fél szétválasztásának kommunikációs sorrendjét érdemes tudatosabban megterveznie.",
   nextModule: "Csapatmunka és eszkaláció",
+  visual: {
+    hero: {
+      src: "/scenarios/eset-15/hero.webp",
+      alt: "Közösségi tér: két fogvatartott feszülten, egymással szemben áll, a háttérben mások figyelik az esetet, jobbra a szolgálatot teljesítő állomány tagja közelít.",
+      width: 1600,
+      height: 900,
+    },
+  },
   timeline: [
     { id: "t1", time: "17:24", label: "Szóváltás észlelve" },
     { id: "t2", time: "17:25", label: "Kockázatértékelés" },
@@ -273,6 +297,14 @@ export const UJ_BEFOGADOTT: Scenario = {
   strengths: "Nyugodt jelenléttel jól tudod csökkenteni az újonnan érkezők kezdeti feszültségét.",
   growthArea: "A rendelkezésre álló előzetes információk (pl. befogadási adatlap) tudatosabb, korábbi bevonása segítene.",
   nextModule: "Információgyűjtés és jelentés",
+  visual: {
+    hero: {
+      src: "/scenarios/eset-19/hero.webp",
+      alt: "Befogadó helyiség: szolgálatot teljesítő állomány tagja íróasztalnál rögzíti az adatokat, előtte feszülten álló, nemrég érkezett személy, az asztalon személyes tárgyak tálcán.",
+      width: 1600,
+      height: 900,
+    },
+  },
   timeline: [
     { id: "t1", time: "09:10", label: "Fokozott feszültség észlelve" },
     { id: "t2", time: "09:12", label: "Nyugodt kommunikáció megkezdve" },
@@ -353,6 +385,15 @@ export const RENDKIVULI_ESEMENY_UTAN: Scenario = {
   strengths: "Alaposan gyűjtöd össze az érintettek és tanúk körét egy esemény után.",
   growthArea: "A jelentés időrendi pontosságát és tömörségét érdemes még fejlesztened.",
   nextModule: "Rendkívüli esemény utóértékelése",
+  processChain: ["Tény", "Forrás", "Időrend", "Intézkedés", "Dokumentáció"],
+  visual: {
+    hero: {
+      src: "/scenarios/eset-22/hero.webp",
+      alt: "Ügyeleti iroda: két kolléga az esemény utóértékelését végzi, CCTV monitorokat, jegyzeteket és rádiót használva az információk összegzéséhez.",
+      width: 1600,
+      height: 900,
+    },
+  },
   timeline: [
     { id: "t1", time: "21:05", label: "Utóértékelés megkezdve" },
     { id: "t2", time: "21:12", label: "Tanúk meghallgatása" },

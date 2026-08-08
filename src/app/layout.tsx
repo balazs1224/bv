@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 import { RoleProvider } from "@/components/layout/role-context";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { DemoModeProvider } from "@/lib/demo-mode-context";
+import { DemoModeBanner } from "@/components/demo/demo-mode-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,9 +36,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`dark ${geistSans.variable} ${geistMono.variable} ${plexSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <RoleProvider>
-          <TooltipProvider delay={200}>{children}</TooltipProvider>
-        </RoleProvider>
+        <DemoModeProvider>
+          <RoleProvider>
+            <TooltipProvider delay={200}>{children}</TooltipProvider>
+          </RoleProvider>
+          <DemoModeBanner />
+        </DemoModeProvider>
       </body>
     </html>
   );

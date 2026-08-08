@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { CompetencyKey, DecisionQuality } from "@/lib/types";
-import { COMPETENCIES } from "@/lib/data/meta";
+import type { CompetencyKey, DecisionQuality, RiskDimensionKey } from "@/lib/types";
+import { COMPETENCIES, RISK_DIMENSIONS } from "@/lib/data/meta";
 import { QUALITY_META, formatSigned } from "@/lib/scenario-engine";
 import { cn } from "@/lib/utils";
 
@@ -21,20 +21,24 @@ const TONE_DOT: Record<string, string> = {
 };
 
 export function FeedbackPanel({
+  decisionText,
   quality,
   xp,
   rationale,
   risksReduced,
+  remainingRisk = [],
   primaryCompetency,
   competencyDelta,
   takeaway,
   onContinue,
   continueLabel = "Tovább",
 }: {
+  decisionText?: string;
   quality: DecisionQuality;
   xp: number;
   rationale: string;
   risksReduced: string[];
+  remainingRisk?: RiskDimensionKey[];
   primaryCompetency: CompetencyKey;
   competencyDelta: number;
   takeaway: string;
@@ -63,12 +67,18 @@ export function FeedbackPanel({
           <span className="font-mono text-sm tabular-nums text-primary">{formatSigned(xp)} XP</span>
         </div>
 
+        {decisionText && (
+          <FieldBlock label="Döntésed">
+            <p className="text-[14px] leading-relaxed text-foreground/90">{decisionText}</p>
+          </FieldBlock>
+        )}
+
         <FieldBlock label="Miért?">
           <p className="text-[14px] leading-relaxed text-foreground/90">{rationale}</p>
         </FieldBlock>
 
         {risksReduced.length > 0 && (
-          <FieldBlock label="Következmény — csökkentett kockázat">
+          <FieldBlock label="Csökkentett kockázat">
             <ul className="space-y-1">
               {risksReduced.map((r, i) => (
                 <li key={i} className="flex gap-2 text-[14px] leading-relaxed text-foreground/85">
@@ -80,7 +90,24 @@ export function FeedbackPanel({
           </FieldBlock>
         )}
 
-        <FieldBlock label="Fejlesztett kompetencia">
+        <FieldBlock label="Fennmaradó kockázat">
+          {remainingRisk.length > 0 ? (
+            <ul className="space-y-1">
+              {remainingRisk.map((key) => (
+                <li key={key} className="flex gap-2 text-[14px] leading-relaxed text-foreground/85">
+                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-warning" aria-hidden="true" />
+                  {RISK_DIMENSIONS[key].label}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-[14px] leading-relaxed text-foreground/70">
+              A döntés után nincs kiemelt kockázati dimenzió.
+            </p>
+          )}
+        </FieldBlock>
+
+        <FieldBlock label="Kompetenciahatás">
           <div className="flex items-center gap-3">
             <span className="text-[14px] text-foreground/90">{COMPETENCIES[primaryCompetency].label}</span>
             <span
@@ -94,7 +121,7 @@ export function FeedbackPanel({
           </div>
         </FieldBlock>
 
-        <FieldBlock label="Mit vigyél magaddal?">
+        <FieldBlock label="Mit jegyezz meg?">
           <p className="text-[14px] leading-relaxed text-foreground/90">{takeaway}</p>
         </FieldBlock>
       </div>

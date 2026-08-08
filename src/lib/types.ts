@@ -58,14 +58,22 @@ export interface ObservationItem {
   description: string;
 }
 
+export type HotspotType = "point" | "area";
+
 export interface AwarenessMarker {
   id: string;
-  x: number; // % a stilizált alaprajzon
+  /** "point": x/y a jelölő középpontja. "area": x/y a bal felső sarok, width/height is kötelező. Mindegyik érték a kép tényleges megjelenített területéhez viszonyított %. */
+  type?: HotspotType; // alapértelmezett: "point" (visszafelé kompatibilis a korábbi adatokkal)
+  x: number;
   y: number;
+  width?: number; // csak "area" típusnál, %
+  height?: number; // csak "area" típusnál, %
   category: "szemely" | "tavolsag" | "targy" | "tanu" | "kijarat" | "kamera";
   label: string;
   correct: boolean;
   note: string;
+  /** Ha true, a kalibrálás vizuálisan még nem lett véglegesítve — lásd docs/visual-system.md. */
+  needsCalibration?: boolean;
 }
 
 export interface CommunicationChoice {
@@ -112,6 +120,23 @@ export interface TimelineEvent {
   label: string;
 }
 
+export interface ScenarioImage {
+  src: string;
+  alt: string;
+  /** CSS object-position, ha a képet nem középre kell igazítani a konténerben. */
+  objectPosition?: string;
+  /** A forrásfájl tényleges felbontása — az aspect-ratio konténer ebből számol, hogy a hotspot % soha ne csússzon el. */
+  width: number;
+  height: number;
+}
+
+export interface ScenarioVisual {
+  /** Kontextusteremtő scene/hero kép — az első (brief) stage-en és kártya-thumbnailként jelenik meg. */
+  hero?: ScenarioImage;
+  /** Ténylegesen vizsgálandó, hotspotokkal ellátott megfigyelési kép az awareness-map stage-hez. */
+  awareness?: ScenarioImage;
+}
+
 export interface ScenarioSummary {
   id: string;
   code: string;
@@ -121,6 +146,10 @@ export interface ScenarioSummary {
   description: string;
   difficulty: Difficulty;
   estimatedTime: string;
+  /**
+   * Fejlesztett kompetenciák. Konvenció: a [0] index az ELSŐDLEGES kompetencia,
+   * a többi a MÁSODLAGOS kompetenciák listája (lásd SituationBrief / ResultScreen).
+   */
   competencies: CompetencyKey[];
   decisionPoints: number;
   status: "uj" | "folyamatban" | "teljesitve" | "ajanlott";
@@ -136,6 +165,14 @@ export interface Scenario extends ScenarioSummary {
   strengths?: string;
   growthArea?: string;
   nextModule?: string;
+  visual?: ScenarioVisual;
+  /**
+   * Opcionális, szituáció-specifikus munkafolyamat-lánc (pl. ESET 22:
+   * TÉNY → FORRÁS → IDŐREND → INTÉZKEDÉS → DOKUMENTÁCIÓ), a SituationBrief-en jelenik meg.
+   */
+  processChain?: string[];
+  /** Opcionális záró megjegyzés a komplex, több kompetenciát mozgósító gyakorlatokhoz (pl. Kritikus pont). */
+  closingNote?: string;
 }
 
 export interface TrainingModule {
@@ -148,6 +185,8 @@ export interface TrainingModule {
   difficulty: Difficulty;
   competency: CompetencyKey;
   status: "nincs_elkezdve" | "folyamatban" | "teljesitve" | "zarolt";
+  /** Opcionális: hol/mikor hasznosul a modul a szolgálati gyakorlatban ("Hol használod?"). */
+  appliesTo?: string;
 }
 
 export interface MicroExercise {

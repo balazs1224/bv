@@ -11,6 +11,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kezdo",
     competency: "helyzetfelismeres",
     status: "teljesitve",
+    appliesTo: "Körletjárás, reggeli ellenőrzés, folyosói szolgálat közben.",
   },
   {
     id: "m02",
@@ -22,6 +23,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kozepes",
     competency: "kockazatertekeles",
     status: "folyamatban",
+    appliesTo: "Minden döntési pontnál, amikor a helyzet a beavatkozás közben változik.",
   },
   {
     id: "m03",
@@ -33,6 +35,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kozepes",
     competency: "konfliktuskezeles",
     status: "folyamatban",
+    appliesTo: "Fogvatartottak közötti feszültség vagy nyílt konfliktus korai szakaszában.",
   },
   {
     id: "m04",
@@ -44,6 +47,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kezdo",
     competency: "kommunikacio",
     status: "teljesitve",
+    appliesTo: "Fogvatartottal, kollégával vagy elöljáróval folytatott minden szolgálati párbeszédben.",
   },
   {
     id: "m05",
@@ -55,6 +59,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kozepes",
     competency: "deeszkalacio",
     status: "folyamatban",
+    appliesTo: "Feszült, eszkalálódó helyzetekben, mielőtt fizikai beavatkozásra kerülne sor.",
   },
   {
     id: "m06",
@@ -66,6 +71,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kozepes",
     competency: "informaciogyujtes",
     status: "folyamatban",
+    appliesTo: "Rendkívüli esemény előtti és utáni tényfeltárás, jelentéskészítés során.",
   },
   {
     id: "m07",
@@ -77,6 +83,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kozepes",
     competency: "egyuttmukodes",
     status: "nincs_elkezdve",
+    appliesTo: "Amikor a helyzet meghaladja az egyéni hatáskört, és társ vagy vezető bevonása szükséges.",
   },
   {
     id: "m08",
@@ -88,6 +95,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "kozepes",
     competency: "dokumentacio",
     status: "nincs_elkezdve",
+    appliesTo: "Rendkívüli esemény lezárása után, a visszakereshető jelentés elkészítésekor.",
   },
   {
     id: "m09",
@@ -99,5 +107,6 @@ export const TRAINING_MODULES: TrainingModule[] = [
     difficulty: "halado",
     competency: "kockazatertekeles",
     status: "zarolt",
+    appliesTo: "Komplex, több kompetenciát egyszerre igénylő incidens teljes kezelésekor.",
   },
 ];

@@ -58,7 +58,7 @@ export default function DashboardPage() {
 
         <div className="space-y-6">
           <CompetencyModule values={LEARNER.competencies} />
-          <AdaptiveRecommendation />
+          <AdaptiveRecommendation levels={LEARNER.competencies} />
         </div>
       </div>
 

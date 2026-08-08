@@ -1,5 +1,5 @@
 import { TriangleAlert, CircleCheck, Info } from "lucide-react";
-import type { InsightItem } from "@/lib/data/instructor";
+import { INSIGHT_CATEGORY_LABEL, type InsightItem } from "@/lib/data/instructor";
 
 const TONE_META: Record<InsightItem["tone"], { icon: typeof Info; textClass: string; borderClass: string }> = {
   warning: { icon: TriangleAlert, textClass: "text-warning", borderClass: "border-warning/50" },
@@ -18,7 +18,12 @@ export function InsightList({ insights }: { insights: InsightItem[] }) {
           return (
             <div key={insight.id} className={`flex items-start gap-2.5 border-l-2 pl-4 ${meta.borderClass}`}>
               <Icon className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${meta.textClass}`} aria-hidden="true" />
-              <p className="text-[13px] leading-relaxed text-foreground/85">{insight.text}</p>
+              <div className="space-y-0.5">
+                <p className={`font-mono text-[10px] font-medium uppercase tracking-wide ${meta.textClass}`}>
+                  {INSIGHT_CATEGORY_LABEL[insight.category]}
+                </p>
+                <p className="text-[13px] leading-relaxed text-foreground/85">{insight.text}</p>
+              </div>
             </div>
           );
         })}

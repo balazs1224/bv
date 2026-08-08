@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Scenario } from "@/lib/types";
 import { StatusDot } from "@/components/system/panel";
+import { ScenarioImageFrame } from "@/components/shared/scenario-image";
 
 const DIFFICULTY_LABEL: Record<Scenario["difficulty"], string> = {
   kezdo: "Kezdő",
@@ -20,8 +21,15 @@ export function SituationRow({ scenario }: { scenario: Scenario }) {
     <li>
       <Link
         href={`/szituacio/${scenario.id}`}
-        className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-4 transition-colors hover:bg-surface-raised/60 sm:grid-cols-[64px_1fr_auto_20px] sm:gap-5 sm:px-2"
+        className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-4 transition-colors hover:bg-surface-raised/60 sm:grid-cols-[72px_64px_1fr_auto_20px] sm:gap-5 sm:px-2"
       >
+        <ScenarioImageFrame
+          image={scenario.visual?.hero}
+          sizes="72px"
+          className="hidden w-18 shrink-0 sm:block"
+          fallbackLabel=""
+        />
+
         <span className="hidden font-mono text-[11px] tabular-nums text-muted-foreground sm:block">
           {scenario.code.replace("ESET ", "E")}
         </span>

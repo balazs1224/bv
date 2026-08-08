@@ -66,6 +66,15 @@ export interface CommunicationScoreResult {
   competencyImpact: Partial<Record<CompetencyKey, number>>;
 }
 
+/** Az adott döntés/kommunikáció-választás UTÁN is közepes/magas szinten maradó kockázati dimenziók. */
+export function getRemainingRisk(
+  risk: Record<RiskDimensionKey, RiskLevel>
+): RiskDimensionKey[] {
+  return (Object.keys(risk) as RiskDimensionKey[]).filter(
+    (key) => risk[key] === "kozepes" || risk[key] === "magas"
+  );
+}
+
 export function scoreCommunicationChoice(choice: CommunicationChoice): CommunicationScoreResult {
   const { hangnem, vilagossag, kontroll, eszkalacio, informacioszerzes } = choice.scores;
   const deescalationScore = 100 - eszkalacio;

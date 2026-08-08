@@ -31,6 +31,20 @@ export const ESET_07: Scenario = {
   strengths: "Gyorsan felismered az eszkaláció szempontjából kritikus információkat.",
   growthArea: "A döntést megelőző információgyűjtést érdemes tovább gyakorolnod.",
   nextModule: "Dinamikus kockázatértékelés",
+  visual: {
+    hero: {
+      src: "/scenarios/eset-07/hero.webp",
+      alt: "Zárkakörleti folyosó esti fényben: egy fogvatartott gesztikulálva beszél, mögötte két másik fogvatartott figyeli az esetet, a képen kívüli szolgálatot teljesítő állomány nézőpontjából.",
+      width: 1600,
+      height: 900,
+    },
+    awareness: {
+      src: "/scenarios/eset-07/awareness.webp",
+      alt: "Helyzetfelismerési feladathoz tartozó helyszíni kép egy zárkakörleti folyosóról.",
+      width: 1600,
+      height: 900,
+    },
+  },
   timeline: [
     { id: "t1", time: "19:36", label: "Esemény észlelve" },
     { id: "t2", time: "19:37", label: "Első helyzetértékelés" },
@@ -177,11 +191,14 @@ export const ESET_07: Scenario = {
       helperText:
         "Jelöld meg a stilizált alaprajzon azokat a pontokat, amelyek a szituációs tudatosság szempontjából relevánsak. Ez nem taktikai gyakorlat – a cél a környezet tudatos áttekintése.",
       competencyFocus: ["helyzetfelismeres", "informaciogyujtes"],
+      // Koordináták a public/scenarios/eset-07/awareness.webp fotóhoz kalibrálva (1600x900, 16:9).
+      // Vizuális kalibráció: ?debugHotspots=1 (csak development) a fejlesztői ellenőrzéshez/finomításhoz.
       awarenessMarkers: [
         {
           id: "m1",
-          x: 38,
-          y: 46,
+          type: "point",
+          x: 65,
+          y: 37,
           category: "szemely",
           label: "Feldúlt fogvatartott",
           correct: true,
@@ -189,8 +206,9 @@ export const ESET_07: Scenario = {
         },
         {
           id: "m2",
-          x: 60,
-          y: 58,
+          type: "point",
+          x: 79,
+          y: 40,
           category: "szemely",
           label: "Visszahúzódó fogvatartott",
           correct: true,
@@ -198,8 +216,9 @@ export const ESET_07: Scenario = {
         },
         {
           id: "m3",
-          x: 20,
-          y: 30,
+          type: "point",
+          x: 55,
+          y: 31,
           category: "tanu",
           label: "Szemlélők csoportja",
           correct: true,
@@ -207,8 +226,9 @@ export const ESET_07: Scenario = {
         },
         {
           id: "m4",
-          x: 75,
-          y: 25,
+          type: "point",
+          x: 45,
+          y: 14,
           category: "kijarat",
           label: "Körlet kijárata",
           correct: true,
@@ -216,8 +236,9 @@ export const ESET_07: Scenario = {
         },
         {
           id: "m5",
-          x: 82,
-          y: 68,
+          type: "point",
+          x: 77,
+          y: 6,
           category: "kamera",
           label: "Kamerával lefedett terület",
           correct: true,
@@ -225,8 +246,9 @@ export const ESET_07: Scenario = {
         },
         {
           id: "m6",
-          x: 48,
-          y: 72,
+          type: "point",
+          x: 56,
+          y: 73,
           category: "targy",
           label: "Szabadon hagyott tárgy a folyosón",
           correct: true,
@@ -234,12 +256,15 @@ export const ESET_07: Scenario = {
         },
         {
           id: "m7",
-          x: 30,
-          y: 62,
+          type: "area",
+          x: 27,
+          y: 50,
+          width: 15,
+          height: 20,
           category: "tavolsag",
           label: "Biztonságos kommunikációs távolság",
           correct: true,
-          note: "A megfelelő távolság tartása csökkenti a személyi kockázatot kommunikáció közben.",
+          note: "A megfelelő távolság tartása csökkenti a személyi kockázatot kommunikáció közben – ez nem egy tárgy, hanem a jelenlévők közötti térbeli viszony.",
         },
       ],
     },

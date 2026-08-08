@@ -46,6 +46,11 @@ export function ModuleRow({ module: m }: { module: TrainingModule }) {
           {m.title}
         </h3>
         <p className="max-w-xl text-[13px] leading-relaxed text-muted-foreground">{m.description}</p>
+        {m.appliesTo && (
+          <p className="max-w-xl text-[12px] leading-relaxed text-foreground/60">
+            <span className="text-foreground/80">Hol használod?</span> {m.appliesTo}
+          </p>
+        )}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-0.5 text-xs text-muted-foreground">
           <span>{m.estimatedTime}</span>
           <span>{DIFFICULTY_LABEL[m.difficulty]}</span>

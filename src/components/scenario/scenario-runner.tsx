@@ -75,20 +75,20 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
       riskChangedFrom={riskChangedFrom}
       timelineEvents={scenario.timeline}
       timelineRevealCount={timelineRevealCount}
-      mergeScene={stage.type === "awareness-map"}
+      mergeScene={stage.type === "awareness-map" || stage.type === "brief"}
     >
-      {stage.type === "brief" && <SituationBrief stage={stage} onContinue={goNext} />}
+      {stage.type === "brief" && <SituationBrief scenario={scenario} stage={stage} onContinue={goNext} />}
 
       {stage.type === "observation" && (
         <ObservationPanel key={decisionKey} stage={stage} onContinue={goNext} />
       )}
 
       {stage.type === "decision" && (
-        <DecisionCard key={decisionKey} stage={stage} onChoose={handleDecisionChoose} onContinue={goNext} />
+        <DecisionCard key={decisionKey} stage={stage} risk={risk} onChoose={handleDecisionChoose} onContinue={goNext} />
       )}
 
       {stage.type === "awareness-map" && (
-        <AwarenessMap key={decisionKey} stage={stage} onContinue={goNext} />
+        <AwarenessMap key={decisionKey} scenario={scenario} stage={stage} onContinue={goNext} />
       )}
 
       {stage.type === "communication" && (
@@ -103,6 +103,7 @@ export function ScenarioRunner({ scenario }: { scenario: Scenario }) {
           totalCount={summary.totalCount}
           xpTotal={summary.xpTotal}
           competencyDeltas={summary.competencyDeltas}
+          finalRisk={risk}
         />
       )}
     </ScenarioShell>

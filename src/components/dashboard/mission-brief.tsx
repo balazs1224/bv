@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Scenario } from "@/lib/types";
-import { CorridorIllustration } from "@/components/shared/corridor-illustration";
+import { ScenarioImageFrame } from "@/components/shared/scenario-image";
 import { StatusDot } from "@/components/system/panel";
 import { cn } from "@/lib/utils";
 
@@ -68,19 +68,27 @@ export function MissionBrief({ scenario }: { scenario: Scenario }) {
           </Link>
         </div>
 
-        <div className="relative min-h-[260px] overflow-hidden border-t border-hairline lg:min-h-full lg:border-l lg:border-t-0">
-          <CorridorIllustration className="absolute inset-0 h-full w-full" />
+        <ScenarioImageFrame
+          image={scenario.visual?.hero}
+          priority
+          sizes="(min-width: 1024px) 40vw, 100vw"
+          className="min-h-[260px] border-t border-hairline lg:min-h-full lg:border-l lg:border-t-0"
+          fallbackLabel="A helyszíni kép fejlesztés alatt van."
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-surface/70 via-transparent to-transparent lg:bg-gradient-to-r" />
 
           <div className="absolute left-4 top-4 space-y-1 font-mono text-[11px] tabular-nums text-white/70">
-            <p>{scenario.time.replace(":", ":")}:00</p>
+            <p>{scenario.time}:00</p>
           </div>
 
           <div className={cn("absolute bottom-4 left-4 right-4 flex flex-wrap gap-x-5 gap-y-1")}>
             <MetaChip label="Érintett személyek" value="4" />
-            <MetaChip label="Megfigyelési pont" value={String(scenario.stages.find((s) => s.type === "observation")?.observations?.length ?? "—")} />
+            <MetaChip
+              label="Megfigyelési pont"
+              value={String(scenario.stages.find((s) => s.type === "observation")?.observations?.length ?? "—")}
+            />
           </div>
-        </div>
+        </ScenarioImageFrame>
       </div>
     </div>
   );

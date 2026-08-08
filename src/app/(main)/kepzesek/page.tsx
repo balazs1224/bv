@@ -3,6 +3,17 @@ import { ArrowRight } from "lucide-react";
 import { TRAINING_MODULES } from "@/lib/data/modules";
 import { MUVELET_KRITIKUS_PONT } from "@/lib/data/scenarios";
 import { ModuleRow } from "@/components/modules/module-row";
+import { ProcessChain } from "@/components/system/process-chain";
+
+const DEVELOPMENTAL_CHAIN = [
+  "Észlelés",
+  "Értékelés",
+  "Kommunikáció",
+  "Beavatkozási döntés",
+  "Együttműködés",
+  "Dokumentáció",
+  "Komplex alkalmazás",
+];
 
 export default function KepzesekPage() {
   const regular = TRAINING_MODULES.filter((m) => m.status !== "zarolt");
@@ -11,13 +22,16 @@ export default function KepzesekPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
-      <div>
-        <p className="type-eyebrow mb-1">Gyakorlótár</p>
-        <h1 className="text-2xl font-semibold text-foreground">Képzések</h1>
-        <p className="mt-1 max-w-2xl text-[13.5px] text-muted-foreground">
-          A szituációalapú képzési sor kilenc modulból épül fel, a helyzetfelismeréstől a záró komplex
-          gyakorlatig.
-        </p>
+      <div className="space-y-4">
+        <div>
+          <p className="type-eyebrow mb-1">Gyakorlótár</p>
+          <h1 className="text-2xl font-semibold text-foreground">Képzések</h1>
+          <p className="mt-1 max-w-2xl text-[13.5px] text-muted-foreground">
+            A kilenc modul nem egymástól független lecke, hanem egyetlen fejlődési ív: minden modul egy
+            korábbi kompetenciára épül, és a záró komplex gyakorlatban fut össze.
+          </p>
+        </div>
+        <ProcessChain steps={DEVELOPMENTAL_CHAIN} />
       </div>
 
       <ul className="divide-y divide-hairline border-y border-hairline">

@@ -14,8 +14,22 @@ export const INSTRUCTOR_KPIS: InstructorKpi[] = [
   { label: "Problémás kompetencia", value: "Dokumentáció", delta: "Átlag: 61%", trend: "down" },
 ];
 
+export type InsightCategory =
+  | "gyakori_dontesi_hiba"
+  | "nehez_kompetencia"
+  | "szituacios_mintazat"
+  | "fejlodesi_trend";
+
+export const INSIGHT_CATEGORY_LABEL: Record<InsightCategory, string> = {
+  gyakori_dontesi_hiba: "Gyakori döntési hiba",
+  nehez_kompetencia: "Nehéz kompetencia",
+  szituacios_mintazat: "Szituációs mintázat",
+  fejlodesi_trend: "Fejlődési trend",
+};
+
 export interface InsightItem {
   id: string;
+  category: InsightCategory;
   text: string;
   tone: "info" | "warning" | "positive";
 }
@@ -23,26 +37,31 @@ export interface InsightItem {
 export const INSTRUCTOR_INSIGHTS: InsightItem[] = [
   {
     id: "i1",
+    category: "gyakori_dontesi_hiba",
     text: "A tanulók 37%-a túl korán hozott döntést megfelelő helyzetértékelés nélkül.",
     tone: "warning",
   },
   {
     id: "i2",
+    category: "fejlodesi_trend",
     text: "A kommunikációs kompetencia átlagosan 14%-kal javult három gyakorlás után.",
     tone: "positive",
   },
   {
     id: "i3",
+    category: "nehez_kompetencia",
     text: "Az Új belépők csoportban a dokumentációs pontosság 22%-kal elmarad az átlagtól.",
     tone: "warning",
   },
   {
     id: "i4",
+    category: "fejlodesi_trend",
     text: "A deeszkalációs modult elvégzők eszkalációs kockázati döntései 18%-kal ritkábban minősülnek gyengének.",
     tone: "positive",
   },
   {
     id: "i5",
+    category: "szituacios_mintazat",
     text: "A záró komplex szituációt eddig a tanulók 41%-a kísérelte meg, átlagosan 79%-os teljesítménnyel.",
     tone: "info",
   },
