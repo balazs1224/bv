@@ -189,7 +189,7 @@ export const ESET_07: Scenario = {
         "Támogatást kértél, kollégád másodpercek múlva csatlakozik. Amíg megérkezik, mérd fel vizuálisan a teret.",
       question: "Mit vennél észre a helyszínen?",
       helperText:
-        "Jelöld meg a stilizált alaprajzon azokat a pontokat, amelyek a szituációs tudatosság szempontjából relevánsak. Ez nem taktikai gyakorlat – a cél a környezet tudatos áttekintése.",
+        "Tekintsd át a helyszíni képet, és azonosítsd azokat a vizuális jeleket, amelyek a következő döntésed szempontjából relevánsak. Ez nem taktikai gyakorlat – a cél a környezet tudatos áttekintése.",
       competencyFocus: ["helyzetfelismeres", "informaciogyujtes"],
       // Koordináták a public/scenarios/eset-07/awareness.webp fotóhoz kalibrálva (1600x900, 16:9).
       // Vizuális kalibráció: ?debugHotspots=1 (csak development) a fejlesztői ellenőrzéshez/finomításhoz.

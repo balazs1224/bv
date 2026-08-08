@@ -32,7 +32,22 @@ test("Kritikus pont – parancsnoki nézetből helyszíni tudatossági feladatba
   const continueButton = page.getByRole("button", { name: "Tovább" });
   await expect(continueButton).toBeDisabled();
 
-  // Point hotspot.
+  // 4a. Hotspots must not be visible before discovery: no rendered number/checkmark, and a
+  // transparent background — production/non-debug must not draw circles or areas up front.
+  const firstHotspot = page.getByRole("button", { name: "1. jelölhető pont a helyszínen" });
+  await expect(firstHotspot).toHaveText("");
+  const bg = await firstHotspot.evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(bg === "rgba(0, 0, 0, 0)" || bg === "transparent").toBe(true);
+
+  // 4b. Clicking an empty area of the scene must not punish — gentle message, counter unchanged.
+  const scene = page.getByRole("group", { name: /Helyszíni fotó/ });
+  const sceneBox = await scene.boundingBox();
+  if (!sceneBox) throw new Error("awareness scene not found");
+  await scene.click({ position: { x: sceneBox.width * 0.95, y: sceneBox.height * 0.95 } });
+  await expect(page.getByText("Ezen a területen nincs kiemelt jel. Nézd át a helyszínt tovább.").first()).toBeVisible();
+  await expect(page.getByText("Azonosított elemek (0/5)")).toBeVisible();
+
+  // 4c. Point hotspot.
   await page.getByRole("button", { name: "1. jelölhető pont a helyszínen" }).click();
   await expect(page.getByText("Azonosított elemek (1/5)")).toBeVisible();
 
@@ -48,4 +63,14 @@ test("Kritikus pont – parancsnoki nézetből helyszíni tudatossági feladatba
   // The now-found marker reveals a neutral framing, never "suspicious perpetrator" or "dangerous person".
   await expect(page.getByText("Ismeretlen okból jelenlévő személy")).toBeVisible();
   await expect(page.getByText(/gyanús elkövető|veszélyes személy/i)).not.toBeVisible();
+
+  // 4d. Fullscreen ("Helyszín megnyitása") still exposes the same interactive hotspots.
+  await page.getByRole("button", { name: "Helyszín megnyitása" }).click();
+  const dialog = page.getByRole("dialog", { name: /nagyított nézet/ });
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "2. jelölhető pont a helyszínen" }).click();
+  await expect(dialog.getByText("Azonosított elemek: 4/5")).toBeVisible();
+  await dialog.getByRole("button", { name: "Nagyított nézet bezárása" }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.getByText("Azonosított elemek (4/5)")).toBeVisible();
 });

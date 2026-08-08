@@ -3,8 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   timeout: 30_000,
-  // A single shared `next dev` server backs these smoke tests; running them serially avoids
-  // resource contention / on-demand compile races between workers in constrained environments.
+  // A single shared server backs these smoke tests; running them serially avoids resource
+  // contention between workers in constrained environments.
   fullyParallel: false,
   workers: 1,
   reporter: "list",

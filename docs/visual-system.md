@@ -88,16 +88,29 @@ Ez a megkülönböztetés azért szükséges, mert egy relációs fogalmat (táv
 ponthoz rögzíteni — az área típus lehetővé teszi, hogy a jelölés a tényleges térbeli kiterjedést
 fedje le.
 
-**Progresszív feltárás:** a jelölők kategóriája és felirata a felfedezésig rejtve marad — az
-azonosítatlan jelölők `aria-label`-je és listaeleme egységesen "Jelölhető pont a helyszínen" szöveget
-kap, hogy sem a látvány, sem a képernyőolvasó ne súgja meg előre a választ. Téves kattintás esetén a
-visszajelzés visszafogott ("Ezen a területen nincs kiemelt jel. Nézd át a helyszínt tovább."),
-nincs pontlevonás, hangjelzés vagy játékos büntetés.
+**A hotspotok vizuálisan teljesen láthatatlanok felfedezés előtt.** Ez a rendszer legfontosabb
+pedagógiai szabálya: nincs előre kirajzolt kör, terület-körvonal, sorszám vagy szín — a hitbox
+(a kattintható terület) létezik és a megadott `x`/`y`/`width`/`height` koordinátákon pontosan
+elhelyezkedik, de `background: transparent`, körvonal és felirat nélkül. A tanulónak ténylegesen
+végig kell néznie a fotót, és saját belátása szerint kell kattintania a releváns pontokra — a
+rendszer nem súgja meg előre, hol vannak a jelek. Csak **sikeres kattintás után** jelenik meg egy
+visszafogott, primary színű jelölő pipával; a jelölő kategóriája és felirata (`aria-label`, illetve
+a szekvenciális lista sora) ekkor válik láthatóvá. Téves/üres területre kattintva a visszajelzés
+visszafogott ("Ezen a területen nincs kiemelt jel. Nézd át a helyszínt tovább."), nincs pontlevonás,
+hangjelzés vagy játékos büntetés.
 
-**Kettős interakciós útvonal (akadálymentesség):** minden hotspot-gombnak van egy pontos viselkedési
-párja egy szekvenciális, billentyűzettel/képernyőolvasóval bejárható listában — mindkettő ugyanazt a
-`toggle(id)` állapotot vezérli. Ez azt jelenti, hogy a feladat vizuális letapogatás nélkül, kizárólag
-Tab/Enter navigációval is teljesíthető, anélkül hogy a lista előre elárulná a helyes válaszokat.
+**Kettős interakciós útvonal (akadálymentesség) — nem egy triviális, mindig helyes lista.** A
+képen lévő hotspot-gomboknak van egy funkcionális párja egy szekvenciális, billentyűzettel/
+képernyőolvasóval bejárható listában, ugyanazt a `toggle(id)` állapotot vezérelve — a feladat
+vizuális letapogatás nélkül, kizárólag Tab/Enter navigációval is teljesíthető. Fontos különbség
+azonban: a lista **nem** a valódi jelölők egyszerű, azonos sorrendű felsorolása. A `AwarenessMap`
+minden induláskor a valódi jelölőket **véletlenszerűen megkeveri**, és kiegészíti néhány
+(scenario-független, generikus) **csali** elemmel (`DECOY_PROMPTS`, `src/components/scenario/
+awareness-map.tsx`) — ezek felfedezés előtt szövegszinten megkülönböztethetetlenek a valódi
+jelölőktől ("Lehetséges jel a helyszínen"). Egy csalira kattintva a kép üres területére kattintáshoz
+hasonló, nem büntető visszajelzés érkezik, és nem növeli a `found` számlálót. Enélkül a lista N darab
+mindig-helyes gombból állna, amit vak végigkattintással triviálisan meg lehetne oldani — a csalikkal
+a lista ugyanazt a felismerés-és-döntés logikát gyakoroltatja, mint a fotó vizuális átvizsgálása.
 
 ## 5. Kalibrációs debug mód
 
@@ -111,7 +124,9 @@ finomítható maradt. Ehhez létezik egy fejlesztői segédeszköz:
 - **Megjelenítés:** `HotspotCalibrationOverlay` (`src/components/scenario/hotspot-calibration-overlay.tsx`)
   — kattintásra kiszámítja a kattintott pont %-os koordinátáját a kép tényleges megjelenített
   területéhez képest (`getBoundingClientRect()` alapján), megjeleníti a jelölők jelenlegi
-  középpontjait, és egy gombbal vágólapra másolható koordinátát ad.
+  középpontjait (piros pontok), és egy gombbal vágólapra másolható koordinátát ad. Emellett maguk a
+  `HotspotButton` hitboxok is kapnak egy halvány lime körvonalat/szaggatott keretet debug módban —
+  így a pontos kattintható terület kiterjedése (nem csak a középpontja) is látható, kizárólag ekkor.
 
 ## 6. Kép-leltár és hotspot-koordináták
 

@@ -28,6 +28,23 @@ const stage = {
 } as unknown as Stage;
 
 describe("AwarenessMap", () => {
+  it("renders unfound hotspots fully transparent, with no visible circle, number, or color", () => {
+    render(<AwarenessMap scenario={scenario} stage={stage} onContinue={vi.fn()} />);
+
+    const pointHotspot = screen.getByRole("button", { name: "1. jelölhető pont a helyszínen" });
+    const areaHotspot = screen.getByRole("button", { name: "3. jelölhető pont a helyszínen" });
+
+    // No visible ordinal number or checkmark is rendered before discovery.
+    expect(pointHotspot).toHaveTextContent("");
+    expect(areaHotspot).toHaveTextContent("");
+
+    // No colored/warning styling and no dashed outline before discovery (production, non-debug).
+    expect(pointHotspot.className).toContain("bg-transparent");
+    expect(pointHotspot.className).not.toContain("border-warning");
+    expect(pointHotspot.className).not.toContain("bg-warning");
+    expect(areaHotspot.className).not.toContain("border-dashed");
+  });
+
   it("toggles a point hotspot and updates the found count", async () => {
     const user = userEvent.setup();
     render(<AwarenessMap scenario={scenario} stage={stage} onContinue={vi.fn()} />);
@@ -63,6 +80,19 @@ describe("AwarenessMap", () => {
     expect(screen.queryByText("CCTV kamera")).not.toBeInTheDocument();
   });
 
+  it("shows a non-punishing message and no reveal when clicking an empty area of the image", async () => {
+    const user = userEvent.setup();
+    render(<AwarenessMap scenario={scenario} stage={stage} onContinue={vi.fn()} />);
+
+    const scene = screen.getByRole("group", { name: /Helyszíni fotó/ });
+    await user.click(scene);
+
+    expect(
+      screen.getAllByText("Ezen a területen nincs kiemelt jel. Nézd át a helyszínt tovább.").length
+    ).toBeGreaterThan(0);
+    expect(screen.getByText("Azonosított elemek (0/3)")).toBeInTheDocument();
+  });
+
   it("enables continuing only once the minimum number of markers is found, then reports the result", async () => {
     const user = userEvent.setup();
     const onContinue = vi.fn();
@@ -80,20 +110,52 @@ describe("AwarenessMap", () => {
     expect(onContinue).toHaveBeenCalledWith({ found: 3, total: 3 });
   });
 
-  it("lets a marker be toggled from the sequential accessible list via the keyboard", async () => {
+  it("mixes real markers with generic decoys in the accessible list, so it cannot be solved by blindly clicking every entry", () => {
+    render(<AwarenessMap scenario={scenario} stage={stage} onContinue={vi.fn()} />);
+
+    const list = screen.getByRole("list");
+    const listButtons = within(list).getAllByRole("button");
+
+    // 3 real markers + 3 generic, scenario-agnostic decoys — more entries than real signals.
+    expect(listButtons).toHaveLength(6);
+    // Pre-discovery, every entry (marker or decoy) reads identically — no way to tell them apart.
+    for (const button of listButtons) {
+      expect(button).toHaveTextContent("Lehetséges jel a helyszínen");
+    }
+  });
+
+  it("resolves every accessible-list entry to either a found marker or a non-punishing miss, ending with exactly the real markers found", async () => {
     const user = userEvent.setup();
     render(<AwarenessMap scenario={scenario} stage={stage} onContinue={vi.fn()} />);
 
     const list = screen.getByRole("list");
     const listButtons = within(list).getAllByRole("button");
-    expect(listButtons).toHaveLength(3);
 
-    listButtons[0].focus();
-    expect(listButtons[0]).toHaveFocus();
+    for (const button of listButtons) {
+      await user.click(button);
+      const found = button.getAttribute("aria-pressed") === "true";
+      if (!found) {
+        expect(
+          screen.getAllByText("Ezen a területen nincs kiemelt jel. Nézd át a helyszínt tovább.").length
+        ).toBeGreaterThan(0);
+      }
+    }
+
+    expect(screen.getByText("Azonosított elemek (3/3)")).toBeInTheDocument();
+  });
+
+  it("lets an accessible-list entry be activated via the keyboard alone", async () => {
+    const user = userEvent.setup();
+    render(<AwarenessMap scenario={scenario} stage={stage} onContinue={vi.fn()} />);
+
+    const list = screen.getByRole("list");
+    const [firstButton] = within(list).getAllByRole("button");
+
+    firstButton.focus();
+    expect(firstButton).toHaveFocus();
 
     await user.keyboard("{Enter}");
 
-    expect(listButtons[0]).toHaveAttribute("aria-pressed", "true");
-    expect(screen.queryByRole("button", { name: "1. jelölhető pont a helyszínen" })).not.toBeInTheDocument();
+    expect(firstButton).toHaveAttribute("aria-pressed", "true");
   });
 });

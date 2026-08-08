@@ -28,10 +28,39 @@ test("ESET 07 – full decision loop from brief to result", async ({ page }) => 
   await expect(page.getByText("Helyszíni tudatosság")).toBeVisible();
   const continueButton = page.getByRole("button", { name: "Tovább" });
   await expect(continueButton).toBeDisabled();
+
+  // 4a. Hotspots must not be visible before discovery: no rendered number/checkmark, and a
+  // transparent background — production/non-debug must not draw circles or areas up front.
+  const firstHotspot = page.getByRole("button", { name: "1. jelölhető pont a helyszínen" });
+  await expect(firstHotspot).toHaveText("");
+  const bg = await firstHotspot.evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(bg === "rgba(0, 0, 0, 0)" || bg === "transparent").toBe(true);
+
+  // 4b. Clicking an empty area of the scene must not punish — gentle message, counter unchanged.
+  const scene = page.getByRole("group", { name: /Helyszíni fotó/ });
+  const sceneBox = await scene.boundingBox();
+  if (!sceneBox) throw new Error("awareness scene not found");
+  await scene.click({ position: { x: sceneBox.width * 0.05, y: sceneBox.height * 0.95 } });
+  await expect(page.getByText("Ezen a területen nincs kiemelt jel. Nézd át a helyszínt tovább.").first()).toBeVisible();
+  await expect(page.getByText("Azonosított elemek (0/7)")).toBeVisible();
+
+  // 4c. Correct-area clicks work and the found counter advances.
   for (let i = 1; i <= 3; i++) {
     await page.getByRole("button", { name: `${i}. jelölhető pont a helyszínen` }).click();
   }
+  await expect(page.getByText("Azonosított elemek (3/7)")).toBeVisible();
   await expect(continueButton).toBeEnabled();
+
+  // 4d. Fullscreen ("Helyszín megnyitása") still exposes the same interactive hotspots.
+  await page.getByRole("button", { name: "Helyszín megnyitása" }).click();
+  const dialog = page.getByRole("dialog", { name: /nagyított nézet/ });
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "4. jelölhető pont a helyszínen" }).click();
+  await expect(dialog.getByText("Azonosított elemek: 4/7")).toBeVisible();
+  await dialog.getByRole("button", { name: "Nagyított nézet bezárása" }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.getByText("Azonosított elemek (4/7)")).toBeVisible();
+
   await continueButton.click();
 
   // 5. Deeszkalációs kommunikáció — pick the calm, professional option.
