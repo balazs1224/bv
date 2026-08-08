@@ -53,7 +53,7 @@ export function ScenarioShell({
         stageCount={stageCount}
       />
 
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-4 px-4 py-4 pb-28 sm:px-6 sm:py-6 sm:pb-28">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6">
         {fullWidthStage ? (
           <div className="min-h-[420px] flex-1">{children}</div>
         ) : renderScene ? (
